@@ -3,7 +3,7 @@ from persistence.Cliente_Repository import Cliente_Repository
 
 
 class Cliente_Service:
-    def _init_(self, cliente_repo: Cliente_Repository):
+    def __init__(self, cliente_repo: Cliente_Repository):
         self.cliente_repo = cliente_repo
 
     def crear_cliente(self, nombre, mail, telefono):
