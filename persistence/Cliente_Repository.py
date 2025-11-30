@@ -2,7 +2,7 @@ from domain.model.Cliente import Cliente
 from persistence.Conexion import Conexion
 
 class Cliente_Repository:
-    def __init__(self, conexion: Conexion):
+    def _init_(self, conexion: Conexion):
         self.conexion = conexion
 
     def agregar_cliente(self, cliente: Cliente):
