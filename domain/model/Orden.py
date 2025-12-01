@@ -88,6 +88,18 @@ class Orden:
             forma_pago=row[7]
         )
 
+    def to_row(self):
+        return [
+            self.__numero_orden,
+            self.__fecha,
+            self.__cliente_id,
+            self.__cliente_nombre,
+            self.__plato,
+            self.__cantidad,
+            self.__precio_total,
+            self.__forma_pago
+        ]
+
     def __str__(self):
         return (f"Orden(numero_orden={self.__numero_orden}, fecha={self.__fecha}, "
                 f"cliente_id={self.__cliente_id}, cliente_nombre={self.__cliente_nombre}, "
