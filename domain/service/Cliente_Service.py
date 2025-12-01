@@ -34,3 +34,9 @@ class Cliente_Service:
         cliente = Cliente(nombre=nombre, mail=mail, telefono=telefono)
         self.cliente_repo.agregar_cliente(cliente)
         return cliente
+
+    def exportar_clientes(self):
+        return self.cliente_repo.exportar_csv_clientes()
+
+    def importar_clientes(self, ruta):
+        return self.cliente_repo.importar_csv_clientes(ruta)

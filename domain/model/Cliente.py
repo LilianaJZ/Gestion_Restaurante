@@ -48,3 +48,15 @@ class Cliente:
 
     def __str__(self):
         return f"Cliente(id={self.__id}, nombre={self.__nombre}, mail={self.__mail}, telefono={self.__telefono}, ordenes={len(self.__ordenes)})"
+
+    @staticmethod
+    def from_row(row):
+        return Cliente(
+            id=row[0],
+            nombre=row[1],
+            mail=row[2],
+            telefono=row[3]
+        )
+
+    def to_row(self):
+        return [self.id, self.nombre, self.mail, self.telefono]
