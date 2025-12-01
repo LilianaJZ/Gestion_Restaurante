@@ -38,13 +38,19 @@ class Conexion:
         cursor = self.connection.cursor(buffered=True)
         try:
             cursor.execute(query, params)
-            self.connection.commit()
-            print("Consulta ejecutada exitosamente")
-            if query.lower().startswith('select'):
+
+            # Detectar si es SELECT (ignorando espacios y saltos de línea)
+            if query.strip().lower().startswith("select"):
                 result = cursor.fetchall()
                 return result
+
+            # Para INSERT, UPDATE, DELETE:
+            self.connection.commit()
+            return cursor.rowcount  # puede devolver filas afectadas
+
         except mysql.connector.Error as err:
-            print("Error al ejecutar la consulta", err)
+            print("Error al ejecutar la consulta:", err)
             return None
+
         finally:
             cursor.close()
