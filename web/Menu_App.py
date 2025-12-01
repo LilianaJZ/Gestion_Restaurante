@@ -1,5 +1,9 @@
 from fpdf import FPDF
 import os
+from domain.service.Cliente_Service import Cliente_Service
+from domain.service.Orden_Service import Orden_Service
+from persistence.Cliente_Repository import Cliente_Repository
+from persistence.Orden_Repository import Orden_Repository
 
 MENU = [
     {"nombre": "Hamburguesa Clásica", "descripcion": "Carne de res, queso, lechuga y tomate.", "tamano": "Regular", "precio": 12000},
@@ -36,8 +40,10 @@ def menu_principal(cliente_service, orden_service):
             os.makedirs("recibos")
 
         # Generar PDF
-        pdf = FPDF()
+        pdf = FPDF(format=(80, 150)) # Tamaño recibo pequeño # O para tamaño A6: pdf = FPDF(format='A6')
         pdf.add_page()
+        pdf.set_auto_page_break(auto=True, margin=10)
+        # --- ENCABEZADO ---
         pdf.set_font("Arial", size=12)
         pdf.cell(0, 10, "RECIBO DE ORDEN", ln=True, align="C")
         pdf.cell(0, 10, "=" * 30, ln=True, align="C")
@@ -53,6 +59,7 @@ def menu_principal(cliente_service, orden_service):
         pdf.cell(0, 10, "=" * 30, ln=True, align="C")
         pdf.cell(0, 10, "¡Gracias por tu compra!", ln=True, align="C")
 
+        # Guardar archivo
         nombre_archivo = f"recibos/recibo_orden_{orden.numero_orden}.pdf"
         pdf.output(nombre_archivo)
         print(f"\nRecibo PDF generado: {nombre_archivo}")
@@ -67,9 +74,11 @@ def menu_principal(cliente_service, orden_service):
         print("3. Consultar Menú")
         print("4. Consultar Mis Datos")
         print("5. Consultar Mis Órdenes")
-        print("6. Salir")
+        print("6. Importar / Exportar Datos")
+        print("7. Salir")
         opcion = input("Opción: ").strip()
 
+        # OPCIÓN 1 → Registrar cliente
         if opcion == "1":
             limpiar_pantalla()
             print("--- REGISTRAR CLIENTE ---")
@@ -80,7 +89,7 @@ def menu_principal(cliente_service, orden_service):
             cliente_actual = cliente_service.registrar_cliente(nombre, mail, telefono)
             print("\nCliente registrado con éxito.")
             input("Presiona Enter para continuar...")
-
+        # OPCIÓN 2 → Hacer una orden
         elif opcion == "2":
             if not cliente_actual:
                 print("Primero debe registrar un cliente.")
@@ -134,14 +143,14 @@ def menu_principal(cliente_service, orden_service):
             if imprimir == "s":
                 imprimir_orden(orden)
             input("Presiona Enter para continuar...")
-
+        # OPCIÓN 3 → Consultar menú
         elif opcion == "3":
             limpiar_pantalla()
             print("--- MENÚ DEL RESTAURANTE ---")
             for plato in MENU:
                 print(f"{plato['nombre']} - {plato['descripcion']} - {plato['tamano']} - ${plato['precio']}")
             input("Presiona Enter para continuar...")
-
+        # OPCIÓN 4 → Consultar mis datos
         elif opcion == "4":
             limpiar_pantalla()
             if not cliente_actual:
@@ -153,7 +162,7 @@ def menu_principal(cliente_service, orden_service):
                 print(f"Email: {cliente_actual.mail}")
                 print(f"Teléfono: {cliente_actual.telefono}")
             input("Presiona Enter para continuar...")
-
+        # OPCIÓN 5 → Consultar órdenes del cliente
         elif opcion == "5":
             limpiar_pantalla()
             if not cliente_actual:
@@ -176,8 +185,57 @@ def menu_principal(cliente_service, orden_service):
                     if orden_a_imprimir:
                         imprimir_orden(orden_a_imprimir)
             input("Presiona Enter para continuar...")
-
+        # OPCIÓN 6 → IMPORTAR / EXPORTAR
         elif opcion == "6":
+
+            while True:
+                limpiar_pantalla()
+                print("--- IMPORTAR / EXPORTAR DATOS ---")
+                print("1. Exportar Clientes")
+                print("2. Importar Clientes")
+                print("3. Exportar Órdenes")
+                print("4. Importar Órdenes")
+                print("5. Volver")
+                sub = input("Opción: ").strip()
+
+                if sub == "1":
+                    cliente_service.exportar_clientes()
+                    input("Presiona Enter...")
+                elif sub == "2":
+                   # ruta = input("Ruta del CSV a importar: ").strip()
+                   # ruta ="web/importacion/Clientes/usuarios_prueba.csv"
+                    print("Ruta del CSV a importar: \web\importacion\Clientes")
+                    base_dir = os.path.dirname(os.path.abspath(__file__))
+                    ruta = os.path.join(base_dir,"importacion", "Clientes", "usuarios_prueba.csv")
+                    #print("Archivo existe?", os.path.exists(ruta))
+                    if os.path.exists(ruta):
+                        cliente_service.importar_clientes(ruta)
+                        print("Importación completada.")
+                    else:
+                       print(f"No se encontró el archivo: {ruta}")
+                    input("Presiona Enter...")
+                elif sub == "3":
+                    orden_service.exportar_ordenes_csv()
+                    input("Presiona Enter...")
+                elif sub == "4":
+                    print("Ruta del CSV a importar: \web\importacion\Ordenes")
+                    base_dir = os.path.dirname(os.path.abspath(__file__))
+                    ruta = os.path.join(base_dir, "importacion", "Ordenes", "ordenes_prueba.csv")
+                    #print("Archivo existe?", os.path.exists(ruta))
+                    if os.path.exists(ruta):
+                        orden_service.importar_ordenes_csv(ruta)
+                        print("Importación completada.")
+                    else:
+                        print(f"No se encontró el archivo: {ruta}")
+                    input("Presiona Enter...")
+                elif sub == "5":
+                    break
+                else:
+                    print("Opción inválida.")
+                    input("Presiona Enter...")
+
+        # OPCIÓN 7 → SALIR
+        elif opcion == "7":
             print("Saliendo...")
             break
 
